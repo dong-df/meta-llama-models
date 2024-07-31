@@ -10,7 +10,7 @@ from typing import List
 from .datatypes import (
     CheckpointQuantizationFormat,
     HardwareRequirements,
-    ModelDefinition,
+    ModelId,
     ModelSKU,
     SamplingParams,
     SamplingStrategy,
@@ -21,7 +21,7 @@ CONTEXT_LENGTH = 131072
 VOCAB_SIZE = 128256
 
 
-def llama3_1_model_list() -> List[ModelDefinition]:
+def all_model_skus() -> List[ModelSKU]:
     return base_models() + instruct_models()
 
 
@@ -33,10 +33,10 @@ def recommended_sampling_params() -> SamplingParams:
     )
 
 
-def base_models() -> List[ModelDefinition]:
+def base_models() -> List[ModelSKU]:
     return [
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_8b,
+        ModelSKU(
+            model_id=ModelId.llama3_1_8b,
             description_markdown="Llama 3.1 8b model",
             max_seq_length=CONTEXT_LENGTH,
             huggingface_id="meta-llama/Meta-Llama-3.1-8B",
@@ -58,8 +58,8 @@ def base_models() -> List[ModelDefinition]:
                 "use_scaled_rope": True,
             },
         ),
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_70b,
+        ModelSKU(
+            model_id=ModelId.llama3_1_70b,
             description_markdown="Llama 3.1 70b model",
             huggingface_id="meta-llama/Meta-Llama-3.1-70B",
             max_seq_length=CONTEXT_LENGTH,
@@ -81,8 +81,8 @@ def base_models() -> List[ModelDefinition]:
                 "use_scaled_rope": True,
             },
         ),
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_405b_bf16_mp8,
+        ModelSKU(
+            model_id=ModelId.llama3_1_405b,
             description_markdown="Llama 3.1 405b model (BF16 weights)",
             huggingface_id=None,
             max_seq_length=CONTEXT_LENGTH,
@@ -104,8 +104,8 @@ def base_models() -> List[ModelDefinition]:
                 "use_scaled_rope": True,
             },
         ),
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_405b_fp8_mp8,
+        ModelSKU(
+            model_id=ModelId.llama3_1_405b,
             description_markdown="Llama 3.1 405b model (FP8 quantized)",
             max_seq_length=CONTEXT_LENGTH,
             huggingface_id="meta-llama/Meta-Llama-3.1-405B-FP8",
@@ -128,8 +128,8 @@ def base_models() -> List[ModelDefinition]:
                 "use_scaled_rope": True,
             },
         ),
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_405b_bf16_mp16,
+        ModelSKU(
+            model_id=ModelId.llama3_1_405b,
             description_markdown="Llama 3.1 405b model (BF16 weights)",
             huggingface_id="meta-llama/Meta-Llama-3.1-405B",
             max_seq_length=CONTEXT_LENGTH,
@@ -154,10 +154,10 @@ def base_models() -> List[ModelDefinition]:
     ]
 
 
-def instruct_models() -> List[ModelDefinition]:
+def instruct_models() -> List[ModelSKU]:
     return [
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_8b_instruct,
+        ModelSKU(
+            model_id=ModelId.llama3_1_8b_instruct,
             description_markdown="Llama 3.1 8b instruct model",
             max_seq_length=CONTEXT_LENGTH,
             huggingface_id="meta-llama/Meta-Llama-3.1-8B-Instruct",
@@ -179,8 +179,8 @@ def instruct_models() -> List[ModelDefinition]:
                 "use_scaled_rope": True,
             },
         ),
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_70b_instruct,
+        ModelSKU(
+            model_id=ModelId.llama3_1_70b_instruct,
             description_markdown="Llama 3.1 70b instruct model",
             huggingface_id="meta-llama/Meta-Llama-3.1-70B-Instruct",
             max_seq_length=CONTEXT_LENGTH,
@@ -202,8 +202,8 @@ def instruct_models() -> List[ModelDefinition]:
                 "use_scaled_rope": True,
             },
         ),
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_405b_instruct_bf16_mp8,
+        ModelSKU(
+            model_id=ModelId.llama3_1_405b_instruct,
             description_markdown="Llama 3.1 405b instruct model (BF16 weights)",
             huggingface_id=None,
             max_seq_length=CONTEXT_LENGTH,
@@ -225,8 +225,8 @@ def instruct_models() -> List[ModelDefinition]:
                 "use_scaled_rope": True,
             },
         ),
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_405b_instruct_fp8_mp8,
+        ModelSKU(
+            model_id=ModelId.llama3_1_405b_instruct,
             description_markdown="Llama 3.1 405b instruct model (FP8 quantized)",
             huggingface_id="meta-llama/Meta-Llama-3.1-405B-Instruct-FP8",
             max_seq_length=CONTEXT_LENGTH,
@@ -249,8 +249,8 @@ def instruct_models() -> List[ModelDefinition]:
                 "use_scaled_rope": True,
             },
         ),
-        ModelDefinition(
-            sku=ModelSKU.llama3_1_405b_instruct_bf16_mp16,
+        ModelSKU(
+            model_id=ModelId.llama3_1_405b_instruct,
             description_markdown="Llama 3.1 405b instruct model (BF16 weights)",
             huggingface_id="meta-llama/Meta-Llama-3.1-405B-Instruct",
             max_seq_length=CONTEXT_LENGTH,
@@ -275,31 +275,39 @@ def instruct_models() -> List[ModelDefinition]:
     ]
 
 
-def llama_meta_folder_path(model: ModelDefinition) -> str:
-    if model.sku == ModelSKU.llama3_1_405b_bf16_mp16:
-        return "Meta-Llama-3.1-405B-MP16"
-    elif model.sku == ModelSKU.llama3_1_405b_bf16_mp8:
-        return "Meta-Llama-3.1-405B-MP8"
-    elif model.sku == ModelSKU.llama3_1_405b_fp8_mp8:
-        return "Meta-Llama-3.1-405B"
-    elif model.sku == ModelSKU.llama3_1_405b_instruct_bf16_mp16:
-        return "Meta-Llama-3.1-405B-Instruct-MP16"
-    elif model.sku == ModelSKU.llama3_1_405b_instruct_bf16_mp8:
-        return "Meta-Llama-3.1-405B-Instruct-MP8"
-    elif model.sku == ModelSKU.llama3_1_405b_instruct_fp8_mp8:
-        return "Meta-Llama-3.1-405B-Instruct"
+def llama_meta_folder_path(model: ModelSKU) -> str:
+    gpu = model.hardware_requirements.gpu_count
+    is_fp8 = model.quantization_format == CheckpointQuantizationFormat.fp8_mixed
+
+    if model.model_id == ModelId.llama3_1_405b:
+        if gpu == 16:
+            return "Meta-Llama-3.1-405B-MP16"
+        elif is_fp8:
+            return "Meta-Llama-3.1-405B"
+        else:
+            return "Meta-Llama-3.1-405B-MP8"
+    elif model.model_id == ModelId.llama3_1_405b_instruct:
+        if gpu == 16:
+            return "Meta-Llama-3.1-405B-Instruct-MP16"
+        elif is_fp8:
+            return "Meta-Llama-3.1-405B-Instruct"
+        else:
+            return "Meta-Llama-3.1-405B-Instruct-MP8"
 
     path = model.huggingface_id.split("/")[-1]
     return path
 
 
 # Sadness because Cloudfront rejects our HEAD requests to find Content-Length
-def llama_meta_pth_size(model: ModelDefinition) -> int:
-    if model.sku == ModelSKU.llama3_1_405b_bf16_mp16:
-        return 51268302389
-    elif model.sku == ModelSKU.llama3_1_405b_bf16_mp8:
-        return 101470976045
-    elif model.sku == ModelSKU.llama3_1_405b_fp8_mp8:
-        return 60903742309
+def llama_meta_pth_size(model: ModelSKU) -> int:
+    if model.model_id not in (ModelId.llama3_1_405b, ModelId.llama3_1_405b_instruct):
+        return 0
 
-    return 0
+    gpu = model.hardware_requirements.gpu_count
+    is_fp8 = model.quantization_format == CheckpointQuantizationFormat.fp8_mixed
+    if gpu == 16:
+        return 51268302389
+    elif is_fp8:
+        return 60903742309
+    else:
+        return 101470976045
